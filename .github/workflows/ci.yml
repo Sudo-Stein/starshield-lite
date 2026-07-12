@@ -1,0 +1,139 @@
+# StarShield Lite — continuous integration (reference copy)
+# Active workflow path: .github/workflows/ci.yml
+# Runs tests, lint, and Docker image build on push/PR to main/master.
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  STARSHIELD_DB_LOG: "0"
+  STARSHIELD_API_KEY_REQUIRED: "0"
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Lint (fast signal)
+  # -------------------------------------------------------------------------
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Ruff check
+        # Advisory: report issues but don't block CI hard until codebase is fully cleaned
+        # Remove `continue-on-error` once you want lint to be required.
+        run: ruff check api/ services/ core/ utils/ tests/ main.py config.py --output-format=github
+        continue-on-error: true
+
+      - name: Ruff format check
+        run: ruff format --check api/ services/ core/ utils/ tests/ main.py config.py
+        continue-on-error: true
+
+  # -------------------------------------------------------------------------
+  # Tests (matrix)
+  # -------------------------------------------------------------------------
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements-docker.txt
+            requirements.txt
+
+      - name: Install dependencies
+        # Lean stack is enough for the test suite (no cartopy/GEOS in CI)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-docker.txt
+
+      - name: Ensure data directory
+        run: mkdir -p data && touch data/.gitkeep
+
+      - name: Run pytest
+        run: python -m pytest tests/ -q --tb=short
+
+  # -------------------------------------------------------------------------
+  # Docker image build (+ optional smoke)
+  # -------------------------------------------------------------------------
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: starshield-lite:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke-test container
+        run: |
+          set -euo pipefail
+          docker run -d --name starshield-ci \
+            -p 8000:8000 \
+            -e STARSHIELD_DB_LOG=0 \
+            -e STARSHIELD_API_KEY_REQUIRED=0 \
+            starshield-lite:ci
+
+          # Wait for health endpoint
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8000/health; then
+              echo
+              echo "API is up"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Timed out waiting for /health"
+              docker logs starshield-ci || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          curl -sf "http://127.0.0.1:8000/objects/search?q=ISS&limit=1" | head -c 200 || true
+          echo
+          docker stop starshield-ci
+          docker rm starshield-ci
