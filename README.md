@@ -1,9 +1,6 @@
 # StarShield Lite
 
-**Personal space domain awareness console** · **v0.2.0**
-
-> *Any object → will I see it, where in my sky, what else gets close, and tell me when it matters.*
-
+**Personal space domain awareness console** · **[v0.2.0](CHANGELOG.md)**
 
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
@@ -11,50 +8,133 @@
 [![Docker](https://img.shields.io/badge/docker-compose-2496ED.svg)](https://docs.docker.com/compose/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 
-StarShield Lite is a portfolio-grade toolkit for **orbital awareness** from a ground observer’s perspective. It combines public TLE catalogs, pass prediction with stargazer filtering, pass quality scoring, conjunction watchlists, optional debris awareness, SQLite history, webhook notifications, a FastAPI backend, Streamlit/TUI frontends, and Docker deployment.
+StarShield Lite helps you answer practical questions about satellites from the ground:
 
-**Current release: [v0.2.0](CHANGELOG.md)** — see the changelog for the full feature list.
+- **What is this object?** (search public catalogs by name or NORAD ID)
+- **Will I see it tonight?** (predict passes and score how good they are)
+- **Where is it in my sky?** (interactive starmap + ground track)
+- **What else gets close?** (conjunction watchlists, optional debris)
 
-Default home site: **Kingsland, GA** (30.8°N, 81.65°W) — switchable to other profiles or custom lat/lon.
+It ships with a web API, Streamlit dashboard, terminal UI, CLI, Docker setup, and a guided demo—so you can try it in minutes or dig into the full stack.
+
+> *Any object → will I see it, where in my sky, what else gets close, and tell me when it matters.*
+
+Default observer: **Kingsland, GA** (30.8°N, 81.65°W) — switchable to other profiles or custom coordinates.
 
 ---
 
-## Try it now · 5-minute demo
+## Quick Start
 
-**Fastest way to see value** (local Python):
+**Docker is the easiest way to try the project.** Use local Python if you want the guided CLI demo or to develop.
+
+### Path 1 — Docker (recommended)
+
+**What you get:** API docs in the browser, optional full dashboard + scheduler.
 
 ```bash
 git clone https://github.com/Sudo-Stein/starshield-lite.git
 cd starshield-lite
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[pdf,dev]"
 
-make demo          # or: python demo/demo.py
-# non-interactive:  make demo-auto
+# Full stack (API + Streamlit + scheduler) — best first demo
+docker compose --profile full up --build
 ```
 
-The guided demo walks through **search → pass quality → conjunctions → starmap HTML → ICS/PDF export**.  
-Artifacts land in `data/demo/`. Full guide: [`demo/demo.md`](demo/demo.md).
+Then open:
 
-**Docker full stack** (API + Streamlit + scheduler):
+| Link | What it is |
+|------|------------|
+| http://localhost:8501 | **Streamlit dashboard** (main visual demo) |
+| http://localhost:8000/docs | **API docs** (interactive OpenAPI) |
+| http://localhost:8000/health | Health check |
+
+**In the dashboard (about 2 minutes):**
+
+1. Open **Passes** → object `ISS` → **Predict**
+2. Click a quality grade button (e.g. `#1`) to jump to the **Starmap**
+3. Use the time scrubber and **Play** on sky + ground track views
+4. Optional: **Watchlist** tab → scan `iss-starlink`
+
+If the object list looks empty, fetch catalogs once:
 
 ```bash
-docker compose --profile full up --build
-# API docs:    http://localhost:8000/docs
-# Dashboard:   http://localhost:8501
-# Health:      http://localhost:8000/health
+docker compose exec api python main.py fetch --group stations
+docker compose exec api python main.py fetch --group starlink
 ```
 
-In Streamlit: **Passes** → predict ISS → click a grade button → **Starmap** (linked sky + ground, scrubber, Play).
+Stop everything: `docker compose --profile full down` (or `make docker-down`).
 
-| Goal | Command |
-|------|---------|
-| Guided CLI showcase | `make demo` / `python demo/demo.py` |
-| Best ISS passes | `python main.py passes --name ISS --hours 168 --sort quality --show_breakdown` |
-| ISS–Starlink scan | `python main.py watchlist --cmd scan --wl iss-starlink --hours 48` |
-| Live dashboard | `make dash` or `python main.py dash` |
-| OpenAPI | `make api` → http://127.0.0.1:8000/docs |
-| Full Docker demo | `make docker-full` |
+API only (no Streamlit):
+
+```bash
+docker compose up --build
+# → http://localhost:8000/docs
+```
+
+More Docker detail: [docs/DOCKER.md](docs/DOCKER.md) · or `make docker-full`
+
+---
+
+### Path 2 — Local Python + guided demo
+
+**What you get:** a step-by-step CLI walkthrough (search → passes → conjunctions → starmap files → export).
+
+Requires **Python 3.9+** (3.11+ recommended).
+
+```bash
+git clone https://github.com/Sudo-Stein/starshield-lite.git
+cd starshield-lite
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[pdf,dev]"
+
+make demo              # interactive — press Enter between steps
+# make demo-auto       # no pauses (good for screen recordings)
+```
+
+Or without Make:
+
+```bash
+python demo/demo.py
+python demo/demo.py --auto
+```
+
+Artifacts (ICS, HTML starmaps, optional PDF) land in `data/demo/`.  
+Full showcase guide: **[demo/demo.md](demo/demo.md)**
+
+Useful after install:
+
+```bash
+starshield status
+starshield-dash          # Streamlit → http://localhost:8501
+starshield-api           # API → http://127.0.0.1:8000/docs
+```
+
+---
+
+### Your first 5 minutes (checklist)
+
+| Minute | Docker path | Local Python path |
+|--------|-------------|-------------------|
+| 0–2 | `docker compose --profile full up --build` | `pip install -e ".[pdf,dev]"` |
+| 2–4 | Open http://localhost:8501 · Passes → ISS | `make demo` (or `make demo-auto`) |
+| 4–5 | Starmap scrubber + http://localhost:8000/docs | Open files in `data/demo/` |
+
+---
+
+## Table of contents
+
+- [Quick Start](#quick-start) ← **start here**
+- [Key features](#key-features)
+- [Screenshots](#screenshots)
+- [Installation (detailed)](#installation-detailed)
+- [Ways to run](#ways-to-run)
+- [Example workflows](#example-workflows)
+- [Architecture](#architecture)
+- [Configuration](#configuration)
+- [Project structure](#project-structure)
+- [Documentation](#documentation)
+- [Continuous integration](#continuous-integration)
+- [Development](#development)
+- [License](#license)
 
 ---
 
@@ -77,75 +157,16 @@ In Streamlit: **Passes** → predict ISS → click a grade button → **Starmap*
 | **Packaging** | `pip install -e .` with `starshield` / `starshield-api` / `starshield-dash` entry points |
 | **Ops** | Docker Compose, healthchecks, persistent `data/` volume, GitHub Actions CI |
 
----
+**Handy commands once you are running:**
 
-## Installation
-
-### Option A — Docker (recommended for demos)
-
-```bash
-git clone https://github.com/Sudo-Stein/starshield-lite.git
-cd starshield-lite
-
-# API only
-docker compose up --build
-# → http://localhost:8000/docs   ·   http://localhost:8000/health
-
-# Full showcase: API + Streamlit + background scheduler
-docker compose --profile full up --build
-# → http://localhost:8501  (dashboard)
-```
-
-Other profiles:
-
-```bash
-docker compose --profile ui up --build      # API + Streamlit
-docker compose --profile jobs up --build    # API + watchlist scheduler
-```
-
-| Check | Command |
-|-------|---------|
-| Health | `curl -s http://localhost:8000/health \| jq` |
-| Search | `curl -s 'http://localhost:8000/objects/search?q=ISS&limit=5' \| jq` |
-| Fetch TLEs in container | `docker compose exec api python main.py fetch --group stations` |
-| Stop | `docker compose --profile full down` · or `make docker-down` |
-
-Persistent state (SQLite, TLEs, logs) lives in **`./data`** (gitignored).  
-Details: [docs/DOCKER.md](docs/DOCKER.md) · Showcase guide: [demo/demo.md](demo/demo.md)
-
-### Option B — pip (development & guided demo)
-
-Requires **Python 3.9+** (3.11+ recommended).
-
-```bash
-git clone https://github.com/Sudo-Stein/starshield-lite.git
-cd starshield-lite
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -e ".[pdf,dev]"
-
-make demo                  # guided showcase
-# or:
-starshield status
-starshield-api             # → http://127.0.0.1:8000/docs
-starshield-dash            # Streamlit
-starshield-tui
-```
-
-Optional extras:
-
-| Extra | Install | Provides |
-|-------|---------|----------|
-| `pdf` | `pip install -e ".[pdf]"` | PDF export (`fpdf2`) |
-| `maps` | `pip install -e ".[maps]"` | Cartopy ground-track PNGs |
-| `dev` | `pip install -e ".[dev]"` | pytest, ruff |
-| `full` | `pip install -e ".[full]"` | pdf + maps + dev |
-
-If the index is empty, fetch catalogs once:
-
-```bash
-make fetch                 # stations + starlink
-# or: starshield fetch --group stations
-```
+| Goal | Command |
+|------|---------|
+| Guided CLI showcase | `make demo` / `python demo/demo.py` |
+| Best ISS passes | `python main.py passes --name ISS --hours 168 --sort quality --show_breakdown` |
+| ISS–Starlink scan | `python main.py watchlist --cmd scan --wl iss-starlink --hours 48` |
+| Live dashboard | `make dash` or `python main.py dash` |
+| OpenAPI | `make api` → http://127.0.0.1:8000/docs |
+| Full Docker demo | `make docker-full` |
 
 ---
 
@@ -185,9 +206,87 @@ More images live in [`docs/screenshots/`](docs/screenshots/).
 
 ---
 
+## Installation (detailed)
+
+### Docker (recommended for demos)
+
+Easiest for showing the project to others. No Python venv required on the host.
+
+```bash
+git clone https://github.com/Sudo-Stein/starshield-lite.git
+cd starshield-lite
+
+# API only
+docker compose up --build
+# → http://localhost:8000/docs   ·   http://localhost:8000/health
+
+# Full showcase: API + Streamlit + background scheduler
+docker compose --profile full up --build
+# → http://localhost:8501  (dashboard)
+```
+
+Other profiles:
+
+```bash
+docker compose --profile ui up --build      # API + Streamlit
+docker compose --profile jobs up --build    # API + watchlist scheduler
+```
+
+| Check | Command |
+|-------|---------|
+| Health | `curl -s http://localhost:8000/health \| jq` |
+| Search | `curl -s 'http://localhost:8000/objects/search?q=ISS&limit=5' \| jq` |
+| Fetch TLEs in container | `docker compose exec api python main.py fetch --group stations` |
+| Stop | `docker compose --profile full down` · or `make docker-down` |
+
+Persistent state (SQLite, TLEs, logs) lives in **`./data`** (gitignored).  
+Details: [docs/DOCKER.md](docs/DOCKER.md) · Showcase guide: [demo/demo.md](demo/demo.md)
+
+---
+
+### Local Python (development & guided demo)
+
+Use this when you want to hack on the code, run `make demo`, or avoid Docker.
+
+Requires **Python 3.9+** (3.11+ recommended).
+
+```bash
+git clone https://github.com/Sudo-Stein/starshield-lite.git
+cd starshield-lite
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[pdf,dev]"
+
+make demo                  # guided showcase
+# or:
+starshield status
+starshield-api             # → http://127.0.0.1:8000/docs
+starshield-dash            # Streamlit
+starshield-tui
+```
+
+Optional extras:
+
+| Extra | Install | Provides |
+|-------|---------|----------|
+| `pdf` | `pip install -e ".[pdf]"` | PDF export (`fpdf2`) |
+| `maps` | `pip install -e ".[maps]"` | Cartopy ground-track PNGs |
+| `dev` | `pip install -e ".[dev]"` | pytest, ruff |
+| `full` | `pip install -e ".[full]"` | pdf + maps + dev |
+
+If the index is empty, fetch catalogs once:
+
+```bash
+make fetch                 # stations + starlink
+# or: starshield fetch --group stations
+```
+
+You can also install the full dependency stack with `pip install -r requirements.txt` (includes optional map deps), or the lean API set with `requirements-docker.txt`.
+
+---
+
 ## Ways to run
 
-### Local Python
+### Local Python (after install)
 
 ```bash
 python -m venv .venv
@@ -226,6 +325,7 @@ python main.py schedule --cmd list
 | **API** | `python main.py api` | Integration, OpenAPI, clients |
 | **Scheduler** | `python main.py schedule --cmd start` | Unattended watchlist scans |
 | **Docker** | `docker compose up` | Reproducible demos & portfolio deploys |
+| **Guided demo** | `make demo` / `python demo/demo.py` | Recruiter / portfolio walkthrough |
 
 ---
 
@@ -424,6 +524,8 @@ git push
 | **Test** | `pytest` on Python **3.11** and **3.12** |
 | **Docker** | Multi-stage image build + `/health` smoke test |
 
+---
+
 ## Development
 
 ```bash
@@ -438,7 +540,7 @@ make demo-auto             # non-interactive showcase
 make help                  # all targets
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [demo/demo.md](demo/demo.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [demo/demo.md](demo/demo.md).  
 Business logic lives in `services/`; keep UIs and the API as thin adapters.
 
 ---
