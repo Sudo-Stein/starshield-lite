@@ -3,6 +3,7 @@
 **Personal space domain awareness console** · **[v0.2.0](CHANGELOG.md)**
 
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
+[![CI](https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml/badge.svg)](https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/docker-compose-2496ED.svg)](https://docs.docker.com/compose/)
@@ -32,7 +33,10 @@ Default observer: **Kingsland, GA** (30.8°N, 81.65°W) — switchable to other 
 ```bash
 git clone https://github.com/Sudo-Stein/starshield-lite.git
 cd starshield-lite
-# Optional: cp .env.example .env   # ports, webhooks, API keys
+
+# Recommended for ports, webhooks, and API keys (all optional — defaults work)
+cp .env.example .env
+
 docker compose --profile full up --build
 ```
 
@@ -44,6 +48,8 @@ docker compose --profile full up --build
 
 **In the dashboard (~2 minutes):** Passes → `ISS` → Predict → click a grade button → **Starmap** (scrubber / Play). Optional: Watchlist → `iss-starlink`.
 
+![Streamlit Status — next ISS sky watch](docs/screenshots/04_streamlit_status.png)
+
 If the index is empty:
 
 ```bash
@@ -53,8 +59,6 @@ docker compose exec api python main.py fetch --group starlink
 
 Stop: `docker compose --profile full down` · API-only: `docker compose up --build`  
 Details: [docs/DOCKER.md](docs/DOCKER.md)
-
-![Streamlit Status — next ISS sky watch](docs/screenshots/04_streamlit_status.png)
 
 ---
 
@@ -171,14 +175,11 @@ More images live in [`docs/screenshots/`](docs/screenshots/).
 
 ## Installation (detailed)
 
-### Docker (recommended for demos)
+### Docker
 
-See [Quick Start · Path 1](#path-1--docker-recommended) for the primary flow. Additional detail:
+See [Quick Start · Path 1](#path-1--docker-recommended). Copy [`.env.example`](.env.example) → `.env` before `docker compose` if you want custom ports, webhooks, or API keys (everything remains optional).
 
 ```bash
-# Optional env overrides (webhooks, keys, ports)
-cp .env.example .env
-
 docker compose up --build                      # API only → :8000/docs
 docker compose --profile full up --build       # API + Streamlit + scheduler
 docker compose --profile ui up --build         # API + Streamlit
@@ -196,9 +197,9 @@ Persistent state: **`./data`** (gitignored). Full guide: [docs/DOCKER.md](docs/D
 
 ---
 
-### Local Python (development & guided demo)
+### Local Python
 
-See [Quick Start · Path 2](#path-2--local-python--guided-demo). Extras and catalogs:
+See [Quick Start · Path 2](#path-2--local-python--guided-demo). Optional extras:
 
 | Extra | Install | Provides |
 |-------|---------|----------|
@@ -218,35 +219,6 @@ Also available: `pip install -r requirements.txt` (full stack) or `requirements-
 
 ## Ways to run
 
-### Local Python (after install)
-
-```bash
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt    # full stack (Cartopy, etc.)
-# or lean API stack:
-# pip install -r requirements-docker.txt
-
-python main.py status
-python main.py fetch --group stations
-python main.py fetch --group starlink
-```
-
-### CLI
-
-```bash
-python main.py --help
-python main.py status
-python main.py search --search ISS
-python main.py passes --name ISS --hours 168 --sort quality --show_breakdown
-python main.py watchlist --cmd scan --wl iss-starlink --hours 48
-python main.py history --cmd summary
-python main.py api                 # FastAPI → http://127.0.0.1:8000/docs
-python main.py dash                # Streamlit
-python main.py tui                 # Textual TUI
-python main.py schedule --cmd list
-```
-
 ### Interfaces at a glance
 
 | Interface | Command | Best for |
@@ -256,8 +228,22 @@ python main.py schedule --cmd list
 | **Streamlit** | `python main.py dash` | Maps, starmap, interactive tables |
 | **API** | `python main.py api` | Integration, OpenAPI, clients |
 | **Scheduler** | `python main.py schedule --cmd start` | Unattended watchlist scans |
-| **Docker** | `docker compose up` | Reproducible demos & portfolio deploys |
-| **Guided demo** | `make demo` / `python demo/demo.py` | Recruiter / portfolio walkthrough |
+| **Docker** | `docker compose up` | Reproducible demos and local deploys |
+| **Guided demo** | `make demo` / `python demo/demo.py` | End-to-end feature walkthrough |
+
+### Common CLI commands
+
+```bash
+python main.py --help
+python main.py status
+python main.py search --search ISS
+python main.py passes --name ISS --hours 168 --sort quality --show_breakdown
+python main.py watchlist --cmd scan --wl iss-starlink --hours 48
+python main.py history --cmd summary
+python main.py api                 # → http://127.0.0.1:8000/docs
+python main.py dash                # Streamlit
+python main.py tui                 # Textual TUI
+```
 
 ---
 
@@ -341,6 +327,9 @@ Full write-up: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 ## Configuration
 
+Copy [`.env.example`](.env.example) → `.env` for local or Docker Compose runs. All
+variables are optional; defaults are fine for a first demo.
+
 | Variable | Default | Meaning |
 |----------|---------|---------|
 | `STARSHIELD_DB_LOG` | `1` | Log B+ passes & MEDIUM/HIGH conjs to SQLite |
@@ -358,9 +347,14 @@ Full write-up: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 | `STARSHIELD_WEBHOOK_URL` | _(empty)_ | One or more comma-separated webhook URLs |
 | `STARSHIELD_NOTIFY_PASS_MIN_SCORE` | `70` | Min pass quality score to notify (≈ Grade B) |
 | `STARSHIELD_NOTIFY_CONJ_RISKS` | `HIGH,MEDIUM` | Conjunction risk levels that fire webhooks |
-| `STARSHIELD_INDEX_DEBRIS` | `auto` | `auto` = index debris when cached · `1` force · `0` never |
+| `STARSHIELD_INDEX_DEBRIS` | `auto` | Index debris groups only when TLE caches exist (`1` force · `0` never) |
 
-Copy [`.env.example`](.env.example) → `.env` for local/Docker Compose.
+**Practical notes**
+
+- **Debris index** (`STARSHIELD_INDEX_DEBRIS=auto`) — debris catalogs do not download themselves; after `debris --cmd fetch`, they join search automatically.
+- **Rate limits** — three buckets protect heavy routes; set `STARSHIELD_API_RATE_LIMIT=0` for unrestricted local scripting.
+- **Risk bands** — MEDIUM &lt; 50 km, HIGH &lt; 10 km by default (`CONJ_THRESHOLD_KM` / `CONJ_HIGH_RISK_KM` in `config.py`).
+- More recipes: [docs/USAGE.md](docs/USAGE.md#advanced-configuration-notes).
 
 ### Debris (optional)
 
@@ -408,7 +402,7 @@ starshield-lite/
 │   └── notifications.py    # Optional webhook alerts
 ├── core/                   # Propagation, prediction, sim, maps
 ├── utils/                  # Immutable log, alerts stub
-├── demo/                   # Showcase: demo.py + demo.md
+├── demo/                   # Guided demo: demo.py + demo.md
 ├── examples/               # Extra scripts
 ├── data/                   # Runtime: TLEs, starshield.db, logs (gitignored)
 ├── docs/                   # Architecture, Docker, usage, screenshots
@@ -430,8 +424,8 @@ starshield-lite/
 | [docs/DOCKER.md](docs/DOCKER.md) | Compose profiles, volumes, troubleshooting |
 | [docs/USAGE.md](docs/USAGE.md) | Common CLI/API recipes |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Dev setup, tests, PR guidelines |
-| [demo/demo.md](demo/demo.md) | Showcase guide + impressive one-liners |
-| [demo/demo.py](demo/demo.py) | Guided interactive demo script |
+| [demo/demo.md](demo/demo.md) | Guided demo walkthrough and common commands |
+| [demo/demo.py](demo/demo.py) | Interactive demo script |
 | [examples/](examples/) | Programmatic API / watchlist / export samples |
 | [Makefile](Makefile) | `make demo`, `make docker-full`, `make test`, … |
 
@@ -439,25 +433,12 @@ starshield-lite/
 
 ## Continuous integration
 
-Workflow definition: [`docs/ci/github-actions-ci.yml`](docs/ci/github-actions-ci.yml)
-
-To activate on GitHub (requires a token with the **`workflow`** scope):
-
-```bash
-mkdir -p .github/workflows
-cp docs/ci/github-actions-ci.yml .github/workflows/ci.yml
-git add .github/workflows/ci.yml
-git commit -m "ci: enable GitHub Actions"
-git push
-# Then add a CI badge at the top of this README pointing at:
-# https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml
-```
-
-Once enabled, the pipeline runs on **push** / **PR** to `main` / `master`:
+GitHub Actions runs on every **push** and **pull request** to `main` / `master`.  
+Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
 | Job | What it does |
 |-----|----------------|
-| **Lint** | Ruff check + format (advisory until fully clean) |
+| **Lint** | Ruff check + format |
 | **Test** | `pytest` on Python **3.11** and **3.12** |
 | **Docker** | Multi-stage image build + `/health` smoke test |
 
@@ -466,35 +447,25 @@ Once enabled, the pipeline runs on **push** / **PR** to `main` / `master`:
 ## Development
 
 ```bash
-git clone https://github.com/Sudo-Stein/starshield-lite.git
-cd starshield-lite
-python -m venv .venv && source .venv/bin/activate
 pip install -e ".[pdf,dev]"
-
 make test                  # pytest
 make lint                  # ruff
-make demo-auto             # non-interactive showcase
+make demo-auto             # non-interactive demo
 make help                  # all targets
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [demo/demo.md](demo/demo.md).  
+Full contributor guide (setup, Docker, PR workflow, style): **[CONTRIBUTING.md](CONTRIBUTING.md)**.  
 Business logic lives in `services/`; keep UIs and the API as thin adapters.
 
 ---
 
 ## License
 
-MIT — free to use and adapt for personal and portfolio projects.
+MIT — free to use and adapt.
 
 ## Release
 
-Tagged releases follow semantic versioning. Latest: **v0.2.0**.
-
-```bash
-# After tagging (see CHANGELOG + release notes)
-git checkout v0.2.0
-pip install -e ".[pdf,dev]"
-```
+Tagged releases follow [semantic versioning](https://semver.org/). Latest: **[v0.2.0](CHANGELOG.md)**.
 
 ---
 
@@ -506,4 +477,4 @@ pip install -e ".[pdf,dev]"
 
 ---
 
-Built as a **portfolio demonstration** of full-stack scientific Python: orbital mechanics, multi-interface UX, persistence, REST API, containers, and scheduled ops — without claiming operational space-traffic authority.
+StarShield Lite is an educational / personal SSA toolkit for exploring orbital mechanics, multi-interface UX, persistence, REST APIs, containers, and scheduled ops. It is **not** certified space-traffic management software.

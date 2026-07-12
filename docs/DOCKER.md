@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Docker Engine 20+ and Docker Compose v2  
-- Optional: copy `.env.example` to `.env`  
+- Recommended: `cp .env.example .env` (ports, webhooks, API keys — all optional)  
 
 ## Images
 
@@ -34,11 +34,11 @@ cd starshield-lite
 docker compose --profile full up --build
 ```
 
-| URL | What to show |
-|-----|----------------|
+| URL | Description |
+|-----|-------------|
 | http://localhost:8000/docs | Interactive OpenAPI (search objects, passes) |
 | http://localhost:8000/health | Liveness + index size |
-| http://localhost:8501 | Streamlit: Passes → Jump to Starmap → Play scrubber |
+| http://localhost:8501 | Streamlit dashboard (Passes, Starmap, Watchlist) |
 
 Seed catalogs if the index is empty:
 
@@ -55,7 +55,7 @@ make docker-down
 make docker-logs
 ```
 
-For a CLI-only showcase without Docker, see [`demo/demo.md`](../demo/demo.md).
+For a CLI-only demo without Docker, see [`demo/demo.md`](../demo/demo.md).
 
 ## Common commands
 

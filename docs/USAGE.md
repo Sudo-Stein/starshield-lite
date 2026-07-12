@@ -473,14 +473,47 @@ cp .env.example .env
 | `DB_LOG_PASS_MIN_SCORE` | `config.py` | Default 70 (≈ Grade B) for SQLite pass logging |
 | `OBSERVER_PROFILES` | `config.py` | Named lat/lon sites for CLI / Streamlit |
 
-Debris fetch does **not** happen automatically—run `python main.py debris --cmd fetch` when you want those catalogs. See also [README Configuration](../README.md#configuration) and [`.env.example`](../.env.example).
+### Common tweaks
+
+**Debris in search (`STARSHIELD_INDEX_DEBRIS`)**  
+Leave at `auto`. After you fetch a debris group, it appears in the Object Index
+without restarting. Set `0` if you want passes/search to ignore debris caches.
+
+```bash
+python main.py debris --cmd fetch --group debris
+# search now includes debris objects when INDEX_DEBRIS=auto
+python main.py search --search DEB
+```
+
+**Rate limits**  
+Three buckets: *public* (health/search), *default* (history), *heavy* (passes,
+scans, export). For local scripting against a long-lived API:
+
+```bash
+export STARSHIELD_API_RATE_LIMIT=0
+```
+
+**Risk thresholds**  
+Not env vars — edit `config.py` if you need research bands other than
+MEDIUM &lt; 50 km / HIGH &lt; 10 km. Webhooks and history use the same bands.
+
+**Webhooks**  
+Set `STARSHIELD_WEBHOOK_URL` (or edit `data/notifications.json`) then:
+
+```bash
+python main.py notify --cmd test
+```
+
+Debris fetch does **not** happen automatically—run `python main.py debris --cmd fetch`
+when you want those catalogs. See also [README Configuration](../README.md#configuration)
+and [`.env.example`](../.env.example).
 
 Programmatic usage samples: [`examples/`](../examples/).
 
-## Tips for demos
+## Tips
 
 1. Pre-fetch **stations** + **starlink** so the object index is full.  
 2. Use **quality sort + stargazer=False** if the current epoch has no naked-eye ISS windows.  
-3. Show **OpenAPI** (`/docs`) and **History** tab after a watchlist scan.  
-4. One-liner Docker story: `docker compose --profile full up --build`.  
+3. After a watchlist scan, check **OpenAPI** (`/docs`) and the **History** tab.  
+4. Full stack in one command: `docker compose --profile full up --build`.  
 

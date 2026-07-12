@@ -1,7 +1,7 @@
-"""Future Meshtastic / external alert hooks.
+"""Optional external alert hooks.
 
-This module is a stub for later integration with Meshtastic or other
-notification channels (email, webhook, etc.).
+Console-only by default. Use ``services/notifications.py`` for webhook delivery
+(Discord, Slack, generic HTTP POST).
 """
 
 

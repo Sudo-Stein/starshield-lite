@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Example: create a custom conjunction watchlist and run a short scan.
+"""Register a custom conjunction watchlist and run a short scan.
 
-Watchlists live in ``data/watchlists.json`` (auto-created). This script adds
-an example ``iss-vs-visual`` list if missing, then scans a small sample.
+Use this when you want to define primary-vs-group (or similar) monitoring in
+code rather than editing JSON by hand. Watchlists persist in
+``data/watchlists.json`` (auto-created).
+
+This script upserts an example ``example-iss-visual`` list if missing, then
+scans a small sample for the next few hours.
 
 Prerequisites::
 
+    pip install -e ".[dev]"
     python main.py fetch --group stations
     python main.py fetch --group visual   # or starlink if visual is empty
 
@@ -13,6 +18,7 @@ Usage::
 
     python examples/custom_watchlist.py
     python examples/custom_watchlist.py --scan-only   # use existing list only
+    python examples/custom_watchlist.py --hours 24 --sample 10
 """
 
 from __future__ import annotations

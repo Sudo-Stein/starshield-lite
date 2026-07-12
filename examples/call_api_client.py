@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Example: use the StarShield Lite FastAPI from another Python script.
+"""Call the StarShield Lite HTTP API from Python (httpx).
 
-Prerequisites
--------------
-1. Start the API (another terminal)::
+Use this when you run the FastAPI server and want a minimal client for health
+checks, object search, and pass prediction — the same pattern as external
+integrations.
 
-       python main.py api
-       # or: starshield-api
+Prerequisites::
 
-2. Optional auth (only if STARSHIELD_API_KEY_REQUIRED=1)::
-
-       export STARSHIELD_API_KEY=your-key
+    pip install -e ".[dev]"          # provides httpx
+    python main.py api               # other terminal (or: starshield-api)
+    # if STARSHIELD_API_KEY_REQUIRED=1:
+    #   export STARSHIELD_API_KEY=your-key
 
 Usage::
 

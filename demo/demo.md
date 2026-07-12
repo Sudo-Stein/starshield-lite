@@ -1,6 +1,6 @@
-# StarShield Lite — Showcase Demo
+# StarShield Lite — Demo Guide
 
-A short, impressive path through the product for recruiters, collaborators, or portfolio reviews.
+A short path through the main features for first-time users.
 
 ## Fastest path (5 minutes)
 
@@ -15,7 +15,7 @@ pip install -e ".[pdf,dev]"
 # Guided walkthrough (pauses between steps — press Enter)
 python demo/demo.py
 
-# Or non-interactive (great for screen recordings)
+# Or non-interactive
 python demo/demo.py --auto
 make demo-auto
 ```
@@ -38,13 +38,13 @@ docker compose --profile full up --build
 
 Then open:
 
-| URL | What you see |
-|-----|----------------|
+| URL | Description |
+|-----|-------------|
 | http://localhost:8000/docs | FastAPI OpenAPI playground |
 | http://localhost:8000/health | Health + index size |
 | http://localhost:8501 | Streamlit dashboard |
 
-In Streamlit for maximum impact:
+Suggested Streamlit path:
 
 1. Sidebar: confirm observer (default Kingsland, GA)  
 2. **Passes** → object `ISS` → Predict → click **#1** grade button  
@@ -60,7 +60,7 @@ docker compose exec api python main.py fetch --group starlink
 
 ---
 
-## Impressive one-liners
+## Common commands
 
 ```bash
 # System readiness
@@ -93,7 +93,7 @@ python main.py tui         # Terminal UI
 |------|---------|
 | *(none)* | Interactive; press Enter between steps |
 | `--auto` | No pauses |
-| `--quick` | Shorter windows, skip PDF (fast CI / dry run) |
+| `--quick` | Shorter windows, skip PDF (fast dry run) |
 | `--no-fetch` | Fail if catalogs missing (no network) |
 
 ```bash
@@ -118,12 +118,12 @@ data/demo/
 
 ---
 
-## Talking points (30-second pitch)
+## Feature highlights
 
 1. **Multi-catalog Object Index** — one search across stations, Starlink, visual, debris  
 2. **Pass quality scoring** — not just geometry: darkness, sunlit, elevation → letter grade  
 3. **Conjunction watchlists** — adaptive TCA + risk bands; optional debris  
 4. **Linked visualization** — jump from a scored pass into sky + ground scrubber  
-5. **Production-shaped ops** — FastAPI, rate limits, Docker, scheduler, webhooks, exports  
+5. **Ops-ready surfaces** — FastAPI, rate limits, Docker, scheduler, webhooks, exports  
 
-> Portfolio / educational tool — not operational space-traffic authority software.
+> Educational / personal tool — not operational space-traffic authority software.

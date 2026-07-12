@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Example: predict ISS passes and export ICS / PDF from Python (no CLI).
+"""Predict ISS passes and export ICS / PDF from Python (no CLI).
+
+Use this when embedding StarShield in another app: score upcoming passes,
+write a calendar file for Google/Apple Calendar, and optionally a PDF report.
+Outputs land under ``data/examples/``.
 
 Prerequisites::
 

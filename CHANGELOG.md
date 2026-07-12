@@ -7,18 +7,12 @@ and this project aims to follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Planned / ideas
-
-- Additional notification channels (email, Meshtastic)
-- Expanded debris workflows and multi-primary conjunctions
-- Further dashboard polish and screenshot refresh
-
 ---
 
 ## [0.2.0] — 2026-07-12
 
-First public portfolio release: full multi-interface SSA toolkit with optional
-debris awareness, webhooks, packaging, and ops hardening.
+First public release: full multi-interface SSA toolkit with optional debris
+awareness, webhooks, packaging, and ops hardening.
 
 ### Added
 
@@ -65,14 +59,14 @@ debris awareness, webhooks, packaging, and ops hardening.
 
 ### Notes
 
-- Portfolio / educational tool — not operational space-traffic authority software
+- Educational / personal tool — not operational space-traffic authority software
 - Debris, PDF maps (Cartopy), webhooks, and API keys are **optional** and fail gracefully when unused
 
 ---
 
-## [0.1.0] — unreleased prototype
+## [0.1.0] — 2026-06
 
-Internal scaffolding: TLE fetch, basic passes, early CLI/Streamlit experiments.
+Early prototype: TLE fetch, basic passes, CLI and Streamlit experiments.
 Superseded by **0.2.0**.
 
 [Unreleased]: https://github.com/Sudo-Stein/starshield-lite/compare/v0.2.0...HEAD

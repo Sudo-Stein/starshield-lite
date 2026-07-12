@@ -1,4 +1,4 @@
-# StarShield Lite — common showcase & development commands
+# StarShield Lite — common development and demo commands
 # Usage: make help
 
 .PHONY: help install demo demo-auto demo-quick test lint \
@@ -12,8 +12,8 @@ help:
 	@echo "StarShield Lite — make targets"
 	@echo ""
 	@echo "  install       pip install -e '.[pdf,dev]'"
-	@echo "  demo          Guided interactive showcase (demo/demo.py)"
-	@echo "  demo-auto     Non-interactive showcase"
+	@echo "  demo          Guided interactive demo (demo/demo.py)"
+	@echo "  demo-auto     Non-interactive demo"
 	@echo "  demo-quick    Fast dry-run (short windows, no PDF)"
 	@echo "  test          pytest"
 	@echo "  lint          ruff check"

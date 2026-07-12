@@ -59,7 +59,7 @@ Thumbs.db
 *.swp
 *~
 
-# Plots / notebooks (keep portfolio screenshots only)
+# Plots / notebooks (keep docs/screenshots only)
 *.png
 !docs/screenshots/*.png
 *.pdf

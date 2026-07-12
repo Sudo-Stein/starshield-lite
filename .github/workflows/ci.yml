@@ -1,5 +1,4 @@
-# StarShield Lite — continuous integration (reference copy)
-# Active workflow path: .github/workflows/ci.yml
+# StarShield Lite — continuous integration
 # Runs tests, lint, and Docker image build on push/PR to main/master.
 
 name: CI
@@ -40,8 +39,7 @@ jobs:
         run: pip install ruff
 
       - name: Ruff check
-        # Advisory: report issues but don't block CI hard until codebase is fully cleaned
-        # Remove `continue-on-error` once you want lint to be required.
+        # Non-blocking until the codebase is fully ruff-clean
         run: ruff check api/ services/ core/ utils/ tests/ main.py config.py --output-format=github
         continue-on-error: true
 

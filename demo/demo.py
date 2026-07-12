@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""StarShield Lite — guided showcase demo.
+"""StarShield Lite — guided demo.
 
-Walks through the main portfolio features with clear step banners:
+Walks through the main features with clear step banners:
 
   1. Object Index search
   2. High-quality pass scoring
@@ -226,7 +226,7 @@ def step_conjunction(console, idx, *, quick: bool) -> Optional[dict]:
     groups = set(idx.stats().get("groups_loaded") or [])
     report = None
 
-    # Prefer debris if cached (impressive + unique); else Starlink watchlist
+    # Prefer debris if cached; otherwise Starlink watchlist
     try:
         from services.debris import scan_primary_vs_debris, is_debris_group
         from config import DATA_DIR
@@ -494,7 +494,7 @@ def main(argv: Optional[list] = None) -> int:
     console.print(
         Panel.fit(
             "[bold cyan]StarShield Lite[/bold cyan]  ·  v0.2.0\n"
-            "[white]Guided showcase demo[/white]\n\n"
+            "[white]Guided demo[/white]\n\n"
             "Any object → will I see it, where in my sky,\n"
             "what else gets close, and tell me when it matters.",
             border_style="cyan",
@@ -539,14 +539,14 @@ def main(argv: Optional[list] = None) -> int:
     console.print(
         Panel(
             "[bold green]Demo complete.[/bold green]\n\n"
-            "Next steps for a live showcase:\n"
+            "Next steps:\n"
             "  • [cyan]python main.py dash[/cyan]     Streamlit — Passes → Jump to Starmap\n"
             "  • [cyan]python main.py api[/cyan]      OpenAPI at http://127.0.0.1:8000/docs\n"
             "  • [cyan]python main.py tui[/cyan]      Terminal UI\n"
             "  • [cyan]docker compose --profile full up --build[/cyan]\n\n"
             f"Artifacts: [cyan]{DEMO_OUT}[/cyan]\n"
             "Guide:     [cyan]demo/demo.md[/cyan]",
-            title="Showcase ready",
+            title="Done",
             border_style="green",
         )
     )

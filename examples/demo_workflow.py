@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
-"""Minimal end-to-end workflow (passes + ICS).
+"""Minimal end-to-end workflow: score ISS passes and write an ICS file.
 
-Prefer the full guided showcase:
+Use this as a non-interactive smoke path after install — no server required.
+For the full multi-step tour (search, watchlist, starmap HTML, PDF), prefer::
 
-    python demo/demo.py
     make demo
+    # or: python demo/demo.py
 
-This script remains as a short non-interactive smoke path.
+Prerequisites::
+
+    pip install -e ".[dev]"
+    python main.py fetch --group stations
+
+Usage::
+
+    python examples/demo_workflow.py
 """
 
 from __future__ import annotations

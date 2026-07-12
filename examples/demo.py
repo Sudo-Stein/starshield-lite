@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
-"""Showcase demo entrypoint (delegates to ``demo/demo.py``).
+"""Thin wrapper that runs the guided demo (``demo/demo.py``).
+
+Prefer calling the demo directly, or use Make::
+
+    make demo
+    make demo-auto
+    python demo/demo.py --auto
+
+This file exists so ``python examples/demo.py`` also works from the examples
+folder index.
+
+Usage::
 
     python examples/demo.py
     python examples/demo.py --auto
-    make demo
 """
 
 from __future__ import annotations

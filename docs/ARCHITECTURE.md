@@ -10,7 +10,7 @@ StarShield Lite answers four questions from a ground observer’s point of view:
 4. **What else gets close?** (watchlists + history)  
 5. **Tell me when it matters** (optional webhooks)
 
-It is intentionally **not** a certified space-traffic product; it is a clear, end-to-end engineering showcase.
+It is intentionally **not** a certified space-traffic product; it is a clear, end-to-end engineering toolkit.
 
 ---
 
@@ -174,7 +174,6 @@ CLI/API/Scheduler → get_watchlist(id)
 
 - **Auth:** API key middleware on FastAPI  
 - **Alerts:** hook `utils/alerts.py` after MEDIUM/HIGH watchlist events  
-- **Meshtastic:** parked; same alert sink pattern  
 - **More catalogs:** add URLs to `TLE_URLS` + `INDEX_GROUPS`  
 - **Migrations:** bump `SCHEMA_VERSION` in `database.py` and apply ALTERs  
 
