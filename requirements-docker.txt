@@ -1,0 +1,22 @@
+# Lean dependencies for Docker images (API / Streamlit / scheduler)
+# Full scientific stack (cartopy, etc.) remains in requirements.txt for local use.
+
+skyfield
+sgp4
+numpy
+pandas
+requests
+rich
+python-dotenv
+fire
+fastapi
+uvicorn[standard]
+httpx
+pydantic
+streamlit
+plotly
+apscheduler
+fpdf2
+pytest
+# packaging (optional local install)
+# pip install -e .

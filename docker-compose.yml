@@ -1,0 +1,85 @@
+# StarShield Lite — one-command stack
+#
+#   docker compose up --build
+#   docker compose up api -d
+#   docker compose --profile ui up streamlit
+#   docker compose --profile jobs up scheduler
+#
+# Data (SQLite, TLEs, logs) persists in ./data
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: starshield-lite:latest
+    container_name: starshield-api
+    ports:
+      - "${STARSHIELD_API_PORT:-8000}:8000"
+    environment:
+      STARSHIELD_API_HOST: "0.0.0.0"
+      STARSHIELD_API_PORT: "8000"
+      STARSHIELD_DB_LOG: "${STARSHIELD_DB_LOG:-1}"
+      STARSHIELD_SCHEDULE_ENABLED: "${STARSHIELD_SCHEDULE_ENABLED:-0}"
+      STARSHIELD_API_URL: "http://api:8000"
+      STARSHIELD_API_KEY_REQUIRED: "${STARSHIELD_API_KEY_REQUIRED:-0}"
+      STARSHIELD_API_KEYS: "${STARSHIELD_API_KEYS:-}"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+
+  streamlit:
+    image: starshield-lite:latest
+    container_name: starshield-streamlit
+    profiles: ["ui", "full"]
+    command:
+      [
+        "streamlit",
+        "run",
+        "dashboard.py",
+        "--server.address=0.0.0.0",
+        "--server.port=8501",
+        "--browser.gatherUsageStats=false",
+      ]
+    ports:
+      - "${STARSHIELD_STREAMLIT_PORT:-8501}:8501"
+    environment:
+      STARSHIELD_DB_LOG: "${STARSHIELD_DB_LOG:-1}"
+      STARSHIELD_USE_API: "${STARSHIELD_USE_API:-1}"
+      STARSHIELD_API_URL: "http://api:8000"
+      STARSHIELD_API_KEY: "${STARSHIELD_API_KEY:-}"
+      STARSHIELD_API_KEY_REQUIRED: "${STARSHIELD_API_KEY_REQUIRED:-0}"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scheduler:
+    image: starshield-lite:latest
+    container_name: starshield-scheduler
+    profiles: ["jobs", "full"]
+    command: ["python", "main.py", "schedule", "--cmd", "start", "--foreground"]
+    environment:
+      STARSHIELD_DB_LOG: "${STARSHIELD_DB_LOG:-1}"
+      STARSHIELD_SCHEDULE_ENABLED: "1"
+      STARSHIELD_API_URL: "http://api:8000"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped

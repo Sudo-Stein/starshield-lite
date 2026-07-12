@@ -1,0 +1,21 @@
+# Lightweight lint config for StarShield Lite (CI + local)
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = [
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "I",   # isort
+  "W",   # warnings
+]
+ignore = [
+  "E501",  # line length (many scientific lines / tables)
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["E402"]  # path setup / reloads
+"main.py" = ["E402"]
+
+[format]
+quote-style = "double"

@@ -1,0 +1,74 @@
+# ---------------------------------------------------------------------------
+# Runtime / personal / local state — never commit
+# ---------------------------------------------------------------------------
+data/*
+!data/.gitkeep
+
+# Ephemeris (Skyfield downloads de421.bsp on first use)
+*.bsp
+de421.bsp
+
+# SQLite & locks
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Secrets & environment
+.env
+.env.*
+!.env.example
+data/api_keys.txt
+*.api_key
+**/api_keys.txt
+secrets/
+*.pem
+*.key
+
+# Logs & local reports
+*.log
+data/*.log
+data/*.html
+data/*.ics
+data/*.pdf
+data/*.json
+data/*_tles.txt
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Plots / notebooks (keep portfolio screenshots only)
+*.png
+!docs/screenshots/*.png
+*.pdf
+!docs/screenshots/*.pdf
+.ipynb_checkpoints/
+docs/screenshots/_*.html
+docs/screenshots/_*.png.tmp
+
+# Local agent / session junk
+.grok/
+.claude/
+*.session

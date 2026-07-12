@@ -1,0 +1,37 @@
+# Development overrides — use with:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Mounts source for live edits; enables API reload.
+
+services:
+  api:
+    command:
+      [
+        "python",
+        "-m",
+        "uvicorn",
+        "api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--reload",
+      ]
+    volumes:
+      - ./:/app
+      - ./data:/app/data
+    environment:
+      STARSHIELD_DB_LOG: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+
+  streamlit:
+    volumes:
+      - ./:/app
+      - ./data:/app/data
+
+  scheduler:
+    volumes:
+      - ./:/app
+      - ./data:/app/data
+    environment:
+      STARSHIELD_SCHEDULE_ENABLED: "1"
