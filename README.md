@@ -4,7 +4,7 @@
 
 > *Any object → will I see it, where in my sky, what else gets close, and tell me when it matters.*
 
-[![CI](https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml/badge.svg)](https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml)
+
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
@@ -354,15 +354,23 @@ starshield-lite/
 
 ## Continuous integration
 
-GitHub Actions runs on every **push** and **pull request** to `main`:
+CI workflow template: [`docs/ci/github-actions-ci.yml`](docs/ci/github-actions-ci.yml)
+
+To enable Actions (one-time; needs a token with the `workflow` scope):
+
+```bash
+mkdir -p .github/workflows
+cp docs/ci/github-actions-ci.yml .github/workflows/ci.yml
+git add .github/workflows/ci.yml
+git commit -m "ci: enable GitHub Actions"
+git push
+```
 
 | Job | What it does |
 |-----|----------------|
 | **Lint** | Ruff check + format (non-blocking until fully clean) |
 | **Test** | `pytest` on Python **3.11** and **3.12** |
 | **Docker** | Multi-stage image build + `/health` smoke test |
-
-Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
 ## Development
 
