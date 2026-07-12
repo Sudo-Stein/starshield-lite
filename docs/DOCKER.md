@@ -26,11 +26,43 @@ Lean dependency set: `requirements-docker.txt` (no Cartopy/GEOS stack).
 
 Shared volume: **`./data:/app/data`** — SQLite DB, TLE caches, logs, JSON configs.
 
+## 5-minute Docker demo
+
+```bash
+git clone https://github.com/Sudo-Stein/starshield-lite.git
+cd starshield-lite
+docker compose --profile full up --build
+```
+
+| URL | What to show |
+|-----|----------------|
+| http://localhost:8000/docs | Interactive OpenAPI (search objects, passes) |
+| http://localhost:8000/health | Liveness + index size |
+| http://localhost:8501 | Streamlit: Passes → Jump to Starmap → Play scrubber |
+
+Seed catalogs if the index is empty:
+
+```bash
+docker compose exec api python main.py fetch --group stations
+docker compose exec api python main.py fetch --group starlink
+```
+
+Makefile helpers (host Docker required):
+
+```bash
+make docker-full    # compose --profile full up --build
+make docker-down
+make docker-logs
+```
+
+For a CLI-only showcase without Docker, see [`demo/demo.md`](../demo/demo.md).
+
 ## Common commands
 
 ```bash
 # Build and start API
 docker compose up --build
+# same: make docker-up
 
 # Detached API
 docker compose up api -d
@@ -44,7 +76,7 @@ docker compose --profile ui up --build
 # API + scheduler
 docker compose --profile jobs up --build
 
-# Full stack
+# Full stack (best for demos)
 docker compose --profile full up --build
 
 # Stop

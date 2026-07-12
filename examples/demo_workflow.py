@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""End-to-end demo of StarShield Lite core workflow.
+"""Minimal end-to-end workflow (passes + ICS).
 
-Run from repo root (with venv active):
+Prefer the full guided showcase:
 
-    python examples/demo_workflow.py
+    python demo/demo.py
+    make demo
 
-Requires cached TLEs for stations (and optionally starlink):
-
-    python main.py fetch --group stations
-    python main.py fetch --group starlink
+This script remains as a short non-interactive smoke path.
 """
 
 from __future__ import annotations

@@ -6,7 +6,7 @@ Small, focused contributions are welcome.
 ## Development setup
 
 ```bash
-git clone <repo>
+git clone https://github.com/Sudo-Stein/starshield-lite.git
 cd starshield-lite
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
@@ -16,9 +16,20 @@ pip install -e ".[dev,pdf]"
 ## Running tests & lint
 
 ```bash
+make test
+make lint
+# or:
 pytest tests/ -q
 ruff check api/ services/ core/ utils/ tests/
 ruff format --check api/ services/ core/ utils/ tests/
+```
+
+## Showcase demo
+
+```bash
+make demo          # interactive
+make demo-auto     # CI / recording friendly
+# see demo/demo.md
 ```
 
 CI runs the same checks on Python 3.11 and 3.12, plus a Docker image build.

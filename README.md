@@ -19,6 +19,45 @@ Default home site: **Kingsland, GA** (30.8°N, 81.65°W) — switchable to other
 
 ---
 
+## Try it now · 5-minute demo
+
+**Fastest way to see value** (local Python):
+
+```bash
+git clone https://github.com/Sudo-Stein/starshield-lite.git
+cd starshield-lite
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[pdf,dev]"
+
+make demo          # or: python demo/demo.py
+# non-interactive:  make demo-auto
+```
+
+The guided demo walks through **search → pass quality → conjunctions → starmap HTML → ICS/PDF export**.  
+Artifacts land in `data/demo/`. Full guide: [`demo/demo.md`](demo/demo.md).
+
+**Docker full stack** (API + Streamlit + scheduler):
+
+```bash
+docker compose --profile full up --build
+# API docs:    http://localhost:8000/docs
+# Dashboard:   http://localhost:8501
+# Health:      http://localhost:8000/health
+```
+
+In Streamlit: **Passes** → predict ISS → click a grade button → **Starmap** (linked sky + ground, scrubber, Play).
+
+| Goal | Command |
+|------|---------|
+| Guided CLI showcase | `make demo` / `python demo/demo.py` |
+| Best ISS passes | `python main.py passes --name ISS --hours 168 --sort quality --show_breakdown` |
+| ISS–Starlink scan | `python main.py watchlist --cmd scan --wl iss-starlink --hours 48` |
+| Live dashboard | `make dash` or `python main.py dash` |
+| OpenAPI | `make api` → http://127.0.0.1:8000/docs |
+| Full Docker demo | `make docker-full` |
+
+---
+
 ## Key features
 
 | Area | What you get |
@@ -42,28 +81,39 @@ Default home site: **Kingsland, GA** (30.8°N, 81.65°W) — switchable to other
 
 ## Installation
 
-### Option A — Docker (fastest demo)
+### Option A — Docker (recommended for demos)
 
 ```bash
 git clone https://github.com/Sudo-Stein/starshield-lite.git
 cd starshield-lite
+
+# API only
 docker compose up --build
-# API docs: http://localhost:8000/docs
-# Health:   http://localhost:8000/health
+# → http://localhost:8000/docs   ·   http://localhost:8000/health
+
+# Full showcase: API + Streamlit + background scheduler
+docker compose --profile full up --build
+# → http://localhost:8501  (dashboard)
 ```
 
-Compose profiles:
+Other profiles:
 
 ```bash
-docker compose --profile ui up --build      # + Streamlit → :8501
-docker compose --profile jobs up --build    # + watchlist scheduler
-docker compose --profile full up --build    # API + UI + jobs
+docker compose --profile ui up --build      # API + Streamlit
+docker compose --profile jobs up --build    # API + watchlist scheduler
 ```
 
-Persistent state (SQLite, TLEs, logs) lives in **`./data`**.  
-Details: [docs/DOCKER.md](docs/DOCKER.md)
+| Check | Command |
+|-------|---------|
+| Health | `curl -s http://localhost:8000/health \| jq` |
+| Search | `curl -s 'http://localhost:8000/objects/search?q=ISS&limit=5' \| jq` |
+| Fetch TLEs in container | `docker compose exec api python main.py fetch --group stations` |
+| Stop | `docker compose --profile full down` · or `make docker-down` |
 
-### Option B — pip (editable / development)
+Persistent state (SQLite, TLEs, logs) lives in **`./data`** (gitignored).  
+Details: [docs/DOCKER.md](docs/DOCKER.md) · Showcase guide: [demo/demo.md](demo/demo.md)
+
+### Option B — pip (development & guided demo)
 
 Requires **Python 3.9+** (3.11+ recommended).
 
@@ -73,10 +123,12 @@ cd starshield-lite
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[pdf,dev]"
 
-starshield status          # CLI
-starshield-api             # FastAPI → http://127.0.0.1:8000/docs
-starshield-dash            # Streamlit dashboard
-starshield-tui             # Textual TUI
+make demo                  # guided showcase
+# or:
+starshield status
+starshield-api             # → http://127.0.0.1:8000/docs
+starshield-dash            # Streamlit
+starshield-tui
 ```
 
 Optional extras:
@@ -88,16 +140,12 @@ Optional extras:
 | `dev` | `pip install -e ".[dev]"` | pytest, ruff |
 | `full` | `pip install -e ".[full]"` | pdf + maps + dev |
 
-Core stack is also installable via `pip install -r requirements.txt` (includes optional map deps).
-
-After install, fetch catalogs once:
+If the index is empty, fetch catalogs once:
 
 ```bash
-starshield fetch --group stations
-starshield fetch --group starlink
+make fetch                 # stations + starlink
+# or: starshield fetch --group stations
 ```
-
-End-to-end demo script: `python examples/demo_workflow.py`
 
 ---
 
@@ -328,10 +376,12 @@ starshield-lite/
 │   └── notifications.py    # Optional webhook alerts
 ├── core/                   # Propagation, prediction, sim, maps
 ├── utils/                  # Immutable log, alerts stub
-├── examples/               # End-to-end demo workflow
-├── data/                   # Runtime: TLEs, starshield.db, logs
+├── demo/                   # Showcase: demo.py + demo.md
+├── examples/               # Extra scripts
+├── data/                   # Runtime: TLEs, starshield.db, logs (gitignored)
 ├── docs/                   # Architecture, Docker, usage, screenshots
 ├── tests/                  # pytest suite
+├── Makefile                # make demo · make docker-full · make test
 ├── CONTRIBUTING.md
 ├── Dockerfile
 └── docker-compose.yml
@@ -348,7 +398,9 @@ starshield-lite/
 | [docs/DOCKER.md](docs/DOCKER.md) | Compose profiles, volumes, troubleshooting |
 | [docs/USAGE.md](docs/USAGE.md) | Common CLI/API recipes |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Dev setup, tests, PR guidelines |
-| [examples/demo_workflow.py](examples/demo_workflow.py) | Scripted core workflow demo |
+| [demo/demo.md](demo/demo.md) | Showcase guide + impressive one-liners |
+| [demo/demo.py](demo/demo.py) | Guided interactive demo script |
+| [Makefile](Makefile) | `make demo`, `make docker-full`, `make test`, … |
 
 ---
 
@@ -380,19 +432,13 @@ cd starshield-lite
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[pdf,dev]"
 
-# Tests
-pytest tests/ -q
-
-# Lint
-ruff check api/ services/ core/ utils/ tests/
-ruff format --check api/ services/ core/ utils/ tests/
-
-# Demo workflow (needs cached TLEs)
-starshield fetch --group stations
-python examples/demo_workflow.py
+make test                  # pytest
+make lint                  # ruff
+make demo-auto             # non-interactive showcase
+make help                  # all targets
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for layout guidance and PR expectations.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [demo/demo.md](demo/demo.md).
 Business logic lives in `services/`; keep UIs and the API as thin adapters.
 
 ---
