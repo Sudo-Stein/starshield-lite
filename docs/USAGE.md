@@ -456,9 +456,31 @@ export STARSHIELD_NOTIFY_ENABLED=0
 Delivery is **async by default** (daemon thread) so CLI/API latency stays low.  
 Use `notify --cmd test` for a synchronous check.
 
+## Advanced configuration notes
+
+Copy defaults once:
+
+```bash
+cp .env.example .env
+```
+
+| Setting | Where | Meaning |
+|---------|--------|---------|
+| `STARSHIELD_INDEX_DEBRIS` | env | `auto` = index debris only when `data/*_tles.txt` exists; `1` = always list debris groups; `0` = never |
+| `STARSHIELD_NOTIFY_*` | env / `data/notifications.json` | Webhook enablement, pass min score/grade, conjunction risk filter |
+| `STARSHIELD_API_RATE_LIMIT*` | env | Per-IP quotas; set `STARSHIELD_API_RATE_LIMIT=0` to disable |
+| `CONJ_THRESHOLD_KM` / `CONJ_HIGH_RISK_KM` | `config.py` | Risk bands: MEDIUM &lt; 50 km, HIGH &lt; 10 km (defaults) |
+| `DB_LOG_PASS_MIN_SCORE` | `config.py` | Default 70 (≈ Grade B) for SQLite pass logging |
+| `OBSERVER_PROFILES` | `config.py` | Named lat/lon sites for CLI / Streamlit |
+
+Debris fetch does **not** happen automatically—run `python main.py debris --cmd fetch` when you want those catalogs. See also [README Configuration](../README.md#configuration) and [`.env.example`](../.env.example).
+
+Programmatic usage samples: [`examples/`](../examples/).
+
 ## Tips for demos
 
 1. Pre-fetch **stations** + **starlink** so the object index is full.  
 2. Use **quality sort + stargazer=False** if the current epoch has no naked-eye ISS windows.  
 3. Show **OpenAPI** (`/docs`) and **History** tab after a watchlist scan.  
 4. One-liner Docker story: `docker compose --profile full up --build`.  
+

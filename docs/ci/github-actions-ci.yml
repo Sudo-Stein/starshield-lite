@@ -1,5 +1,6 @@
-# StarShield Lite — continuous integration
-# Runs tests, lint, and Docker image build on push/PR to main.
+# StarShield Lite — continuous integration (reference copy)
+# Active workflow path: .github/workflows/ci.yml
+# Runs tests, lint, and Docker image build on push/PR to main/master.
 
 name: CI
 
