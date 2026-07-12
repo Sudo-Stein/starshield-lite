@@ -2,7 +2,6 @@
 
 **Personal space domain awareness console** · **[v0.2.0](CHANGELOG.md)**
 
-[![CI](https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml/badge.svg)](https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/API-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
@@ -440,10 +439,21 @@ starshield-lite/
 
 ## Continuous integration
 
-Active workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)  
-(copy also kept under [`docs/ci/`](docs/ci/) for reference)
+Workflow definition: [`docs/ci/github-actions-ci.yml`](docs/ci/github-actions-ci.yml)
 
-Runs on **push** and **pull request** to `main` / `master`:
+To activate on GitHub (requires a token with the **`workflow`** scope):
+
+```bash
+mkdir -p .github/workflows
+cp docs/ci/github-actions-ci.yml .github/workflows/ci.yml
+git add .github/workflows/ci.yml
+git commit -m "ci: enable GitHub Actions"
+git push
+# Then add a CI badge at the top of this README pointing at:
+# https://github.com/Sudo-Stein/starshield-lite/actions/workflows/ci.yml
+```
+
+Once enabled, the pipeline runs on **push** / **PR** to `main` / `master`:
 
 | Job | What it does |
 |-----|----------------|
